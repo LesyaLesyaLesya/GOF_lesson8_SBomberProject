@@ -1,16 +1,19 @@
 #include "Tree.h"
-
-void SmallTree::Grow(std::unique_ptr<Tree> state, uint16_t deltaTime)
+void Tree::Draw() const
 {
-	state->SetState(std::make_unique<MiddleTree>(MiddleTree()));
+	state->DrawCurState(this->GetX(), this->GetY());
+}
+void SmallTree::Grow(std::shared_ptr<Tree> state, uint16_t deltaTime)
+{
+	state->SetState(std::make_shared<MiddleTree>(MiddleTree()));
 	DrawCurState(state->GetX(), state->GetY());
 }
-void MiddleTree::Grow(std::unique_ptr<Tree> state, uint16_t deltaTime)
+void MiddleTree::Grow(std::shared_ptr<Tree> state, uint16_t deltaTime)
 {
-	state->SetState(std::make_unique<BigTree>(BigTree()));
+	state->SetState(std::make_shared<BigTree>(BigTree()));
 	DrawCurState(state->GetX(), state->GetY());
 }
-void BigTree::Grow(std::unique_ptr<Tree> state, uint16_t deltaTime)
+void BigTree::Grow(std::shared_ptr<Tree> state, uint16_t deltaTime)
 {
 	DrawCurState(state->GetX(), state->GetY());
 }

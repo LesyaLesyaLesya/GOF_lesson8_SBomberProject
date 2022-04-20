@@ -8,6 +8,7 @@
 #include "Bomb.h"
 #include "Ground.h"
 #include "Tank.h"
+#include "Tree.h"   
 #include "House.h"
 
 using namespace std;
@@ -53,17 +54,32 @@ SBomber::SBomber(std::shared_ptr<MyTools::ILogger> logger)
     pGr->SetWidth(width - 2);
     vecStaticObj.push_back(pGr);
 
-    /*Tank* pTank = new Tank;
+    Tank* pTank = new Tank;
     pTank->SetWidth(13);
     pTank->SetPos(30, groundY - 1);
-    vecStaticObj.push_back(pTank);*/
+    vecStaticObj.push_back(pTank);
+
+    //auto MiddleTreeptr = std::make_shared<MiddleTree>();
+    //auto TreeStatePtr = std::static_pointer_cast<TreeState>(MiddleTreeptr);
+
+    //Tree* pTree = new (nothrow) Tree(TreeStatePtr);
+    
+    /*if (pTree != nullptr)
+    {
+        pTree->SetPos(50, groundY - 1);
+        vecStaticObj.push_back(pTree);
+        //pTree->Move();
+        
+        //delete pStateContext;
+    }*/
+    
 
 
-
-    pTank = new Tank;
+        /*pTank = new Tank;
     pTank->SetWidth(13);
     pTank->SetPos(50, groundY - 1);
-    vecStaticObj.push_back(pTank);
+    vecStaticObj.push_back(pTank);*/
+
 
     House * pHouse = new House;
     pHouse->SetWidth(13);

@@ -7,73 +7,83 @@
 #include "DynamicObject.h"
 
 class Tree;
-class LiquidState;
-class GasState;
+class SmallTree;
+class MiddleTree;
+class BigTree;
 //===============================================================
 class TreeState
 {
-	std::string name;
+	//std::string name;
 public:
-	TreeState(const std::string& name) : name(name) { }
-	std::string GetName() const
+	//TreeState(const std::string& name) : name(name) { }
+	TreeState(){}
+	~TreeState() {}
+	/*std::string GetName() const
 	{
 		return name;
-	}
-	virtual void Grow(std::unique_ptr<Tree> state, uint16_t deltaTime) = 0;
-	virtual void DrawCurState(double x, double y) = 0;
+	}*/
+	//virtual void Grow(std::unique_ptr<Tree> state, uint16_t deltaTime) = 0;
+	virtual void Grow(std::shared_ptr<Tree> state, uint16_t deltaTime) {};
+	virtual void DrawCurState(double x, double y) {};
 };
 //===============================================================
 class Tree : public DynamicObject
 {
 private:
-	std::unique_ptr<TreeState> state;
-	//TreeState* state;
+	//std::unique_ptr<TreeState> state;
+	std::shared_ptr<TreeState> state;
+	
 public:
-	//Tree(TreeState* state)
-	Tree(std::unique_ptr<TreeState> state)
-		: state(std::move(state)) {}
+	Tree(std::shared_ptr<TreeState> state_)
+		: state(std::move(state_)){}
 	~Tree() {}
 
 	void Move(uint16_t time) override
 	{
 		//cout << "Freezing " << state->GetName() << "..." << endl;
-		state->Grow(std::make_unique<Tree>(this), time);
+		state->Grow(std::make_shared<Tree>(this), time);
 	}
 	
-	void SetState(std::unique_ptr<TreeState> s)
+	void SetState(std::shared_ptr<TreeState> s)
 	{
 		//cout << "Chaging state from " << state->GetName()
 			//<< " to " << s->GetName() << "..." << endl;
 		//delete state;
-		state = std::move(s);
+		state = s;
 	}
-	/*std::unique_ptr<TreeState> GetState()
+	void Draw() const override;
+	std::shared_ptr<TreeState> GetState()
 	{
 		return state;
-	}*/
+	}
 	
 };
 class SmallTree : public TreeState
 {
 public:
-	SmallTree() : TreeState("Small") {}
-	void Grow(std::unique_ptr<Tree> state, uint16_t deltaTime) override;
+	SmallTree() : TreeState() {}
+	~SmallTree() override {};
+
+	void Grow(std::shared_ptr<Tree> state, uint16_t deltaTime) override;
 	void DrawCurState(double x, double y) override;
 };
 //===============================================================
 class MiddleTree : public TreeState
 {
 public:
-	MiddleTree() : TreeState("Middle") {}
-	virtual void Grow(std::unique_ptr<Tree> state, uint16_t deltaTime);
+	MiddleTree() : TreeState() {}
+	~MiddleTree() override{};
+	virtual void Grow(std::shared_ptr<Tree> state, uint16_t deltaTime);
 	void DrawCurState(double x, double y) override;
 };
 //===============================================================
 class BigTree : public TreeState
 {
 public:
-	BigTree() : TreeState("Big") {}
-	virtual void Grow(std::unique_ptr<Tree> state, uint16_t deltaTime);
+	BigTree() : TreeState() {}
+	~BigTree() override {};
+
+	virtual void Grow(std::shared_ptr<Tree> state, uint16_t deltaTime);
 	void DrawCurState(double x, double y) override;
 };
 
