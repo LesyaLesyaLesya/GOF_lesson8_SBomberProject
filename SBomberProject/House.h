@@ -13,7 +13,7 @@ public:
 	inline uint16_t GetScore() const override { return score; }
 
 	void Draw() const override;
-
+	House* clone() const override { return new House(*this); };
 private:
 
 	const uint16_t score = 40;
