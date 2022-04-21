@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <utility>
 #include <stdexcept>
+#include <time.h>
 
 #include "SBomber.h"
 #include "Bomb.h"
@@ -56,22 +57,22 @@ SBomber::SBomber(std::shared_ptr<MyTools::ILogger> logger)
 
     Tank* pTank = new Tank;
     pTank->SetWidth(13);
-    pTank->SetPos(30, groundY - 1);
+    pTank->SetPos(50, groundY - 1);
     vecStaticObj.push_back(pTank);
 
-    //auto MiddleTreeptr = std::make_shared<MiddleTree>();
-    //auto TreeStatePtr = std::static_pointer_cast<TreeState>(MiddleTreeptr);
-
-    //Tree* pTree = new (nothrow) Tree(TreeStatePtr);
+    Tree* pTree = new (nothrow) Tree(new SmallTree());
     
-    /*if (pTree != nullptr)
+    if (pTree != nullptr)
     {
-        pTree->SetPos(50, groundY - 1);
-        vecStaticObj.push_back(pTree);
-        //pTree->Move();
-        
+        pTree->SetPos(70, groundY - 1);
+        vecDynamicObj.push_back(pTree);
+        /*while (true)
+        {
+            pTree->Move();
+        }*/
+        //pTree->Move();        
         //delete pStateContext;
-    }*/
+    }
     
 
 
@@ -288,7 +289,53 @@ LevelGUI* SBomber::FindLevelGUI() const
 
     return nullptr;
 }
+void SBomber::CloneObject()
+{
+    vector<DestroyableGroundObject*> vecDestoyableObjects = FindDestoyableGroundObjects();
+    srand(time(NULL));
+    
+    if (vecDestoyableObjects.size() != 0)
+    {
+        int num = 1 + rand() % (vecDestoyableObjects.size());
+        //клонируем объект
+        DestroyableGroundObject* newDestoyableObject = vecDestoyableObjects[num-1]->clone();
+        /*Новый клонированный объект поместить в свободное место на
+        земле, для этого проверить, свободно ли место от других объектов методом
+        перебора всех DestroyableGroundObject в массиве статических объектов с вызовом
+        для них isInside.*/
+        double newDestoyableObjectWidth = newDestoyableObject->GetWidth();
+        bool isInside{ true };
 
+        double x1 = 0 - newDestoyableObjectWidth;
+        double x2{ 0 };
+
+        while (isInside)
+        {
+            int k{ 0 };//показатель, что все объекты не входят в предполагаемый диапазон для позиционировани клонированного объета 
+            x1 = x1 + newDestoyableObjectWidth;
+            x2 = x2 + newDestoyableObjectWidth;
+
+            for (int i = 0; i < vecDestoyableObjects.size(); i++)
+            {
+                if (!vecDestoyableObjects[i]->isInside(x1, x2))
+                {
+                    k++;
+                }
+            }
+            if (k== vecDestoyableObjects.size())
+            {
+                isInside = false;
+            }
+            
+        }
+            
+        if (!isInside)
+        {
+            newDestoyableObject->SetPos(x1, GetMaxY() - 5);
+            vecStaticObj.push_back(newDestoyableObject);
+        }
+    }
+}
 void SBomber::ProcessKBHit()
 {
     int c = _getch();
@@ -321,7 +368,12 @@ void SBomber::ProcessKBHit()
     case 'B':
         DropBomb();
         break;
-
+    case 'd':
+        CloneObject();
+        break;
+    case 'D':
+        CloneObject();
+        break;
     default:
         break;
     }

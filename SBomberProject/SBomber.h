@@ -31,6 +31,8 @@ private:
 
     void CheckPlaneAndLevelGUI();
     void CheckBombsAndGround();
+    void CloneObject();
+
     void __fastcall CheckDestoyableObjects(Bomb* pBomb);
 
     void __fastcall DeleteDynamicObj(DynamicObject * pBomb);

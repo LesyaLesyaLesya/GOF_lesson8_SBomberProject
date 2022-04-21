@@ -2,8 +2,9 @@
 #include <string>
 #include <iostream>
 #include <memory>
-#include "MyTools.h"
+#include <windows.h>
 
+#include "MyTools.h"
 #include "DynamicObject.h"
 
 class Tree;
@@ -17,13 +18,13 @@ class TreeState
 public:
 	//TreeState(const std::string& name) : name(name) { }
 	TreeState(){}
-	~TreeState() {}
+	virtual ~TreeState() {}
 	/*std::string GetName() const
 	{
 		return name;
 	}*/
 	//virtual void Grow(std::unique_ptr<Tree> state, uint16_t deltaTime) = 0;
-	virtual void Grow(std::shared_ptr<Tree> state, uint16_t deltaTime) {};
+	virtual void Grow(Tree* state, uint16_t deltaTime) {};
 	virtual void DrawCurState(double x, double y) {};
 };
 //===============================================================
@@ -31,20 +32,23 @@ class Tree : public DynamicObject
 {
 private:
 	//std::unique_ptr<TreeState> state;
-	std::shared_ptr<TreeState> state;
-	
+	TreeState* state;
+	uint16_t birth_time;
 public:
-	Tree(std::shared_ptr<TreeState> state_)
-		: state(std::move(state_)){}
+	Tree(TreeState* state_)
+		: state(state_) {
+		birth_time = GetTickCount64();
+	}
 	~Tree() {}
 
 	void Move(uint16_t time) override
 	{
 		//cout << "Freezing " << state->GetName() << "..." << endl;
-		state->Grow(std::make_shared<Tree>(this), time);
+		
+		state->Grow(this, 60);
 	}
 	
-	void SetState(std::shared_ptr<TreeState> s)
+	void SetState(TreeState* s)
 	{
 		//cout << "Chaging state from " << state->GetName()
 			//<< " to " << s->GetName() << "..." << endl;
@@ -52,11 +56,11 @@ public:
 		state = s;
 	}
 	void Draw() const override;
-	std::shared_ptr<TreeState> GetState()
+	TreeState* GetState() const
 	{
 		return state;
 	}
-	
+	uint16_t Getbirth_time() const { return birth_time; }
 };
 class SmallTree : public TreeState
 {
@@ -64,7 +68,7 @@ public:
 	SmallTree() : TreeState() {}
 	~SmallTree() override {};
 
-	void Grow(std::shared_ptr<Tree> state, uint16_t deltaTime) override;
+	void Grow(Tree* state, uint16_t deltaTime) override;
 	void DrawCurState(double x, double y) override;
 };
 //===============================================================
@@ -73,7 +77,7 @@ class MiddleTree : public TreeState
 public:
 	MiddleTree() : TreeState() {}
 	~MiddleTree() override{};
-	virtual void Grow(std::shared_ptr<Tree> state, uint16_t deltaTime);
+	virtual void Grow(Tree* state, uint16_t deltaTime);
 	void DrawCurState(double x, double y) override;
 };
 //===============================================================
@@ -83,7 +87,7 @@ public:
 	BigTree() : TreeState() {}
 	~BigTree() override {};
 
-	virtual void Grow(std::shared_ptr<Tree> state, uint16_t deltaTime);
+	virtual void Grow(Tree* state, uint16_t deltaTime);
 	void DrawCurState(double x, double y) override;
 };
 
